@@ -1,0 +1,79 @@
+<html>
+<head>
+<title>main.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #808080;}
+.s3 { color: #6a8759;}
+.s4 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+main.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">numpy </span><span class="s0">as </span><span class="s1">np</span>
+<span class="s0">import </span><span class="s1">matplotlib.pyplot </span><span class="s0">as </span><span class="s1">plt</span>
+<span class="s0">import </span><span class="s1">pandas </span><span class="s0">as </span><span class="s1">pd</span>
+<span class="s0">from </span><span class="s1">sklearn.model_selection </span><span class="s0">import </span><span class="s1">train_test_split</span>
+<span class="s0">from </span><span class="s1">sklearn.linear_model </span><span class="s0">import </span><span class="s1">LinearRegression</span>
+<span class="s0">from </span><span class="s1">sklearn.metrics </span><span class="s0">import </span><span class="s1">mean_squared_error</span>
+<span class="s0">from </span><span class="s1">sklearn.preprocessing </span><span class="s0">import </span><span class="s1">LabelEncoder</span>
+
+<span class="s2"># loading data from CSV file</span>
+<span class="s1">data = pd.read_csv(</span><span class="s3">r&quot;C:\Users\vishr\Downloads\realtor-data.zip.csv&quot;</span><span class="s1">)</span>
+
+<span class="s2"># delete rows with empty cells in 'G' (zip codes) and 'H' (house sizes)</span>
+<span class="s1">data.dropna(subset=[</span><span class="s3">'zip_code'</span><span class="s0">, </span><span class="s3">'house_size'</span><span class="s1">]</span><span class="s0">, </span><span class="s1">inplace=</span><span class="s0">True</span><span class="s1">)</span>
+
+<span class="s2"># get house sizes from column 'H' and zip codes from column 'G'</span>
+<span class="s1">house_sizes = data[</span><span class="s3">'house_size'</span><span class="s1">].values</span>
+<span class="s1">zip_codes = data[</span><span class="s3">'zip_code'</span><span class="s1">].values</span>
+
+<span class="s2"># label encoder object for converting zip codes to numeric values</span>
+<span class="s1">label_encoder = LabelEncoder()</span>
+
+<span class="s2"># fit label encoder to zip codes to transform them into numeric values</span>
+<span class="s1">numeric_zip_codes = label_encoder.fit_transform(zip_codes)</span>
+
+<span class="s2"># replace original zip codes with numeric representations in the data frame</span>
+<span class="s1">data[</span><span class="s3">'zip_code'</span><span class="s1">] = numeric_zip_codes</span>
+
+<span class="s2"># extract house sizes and house prices from the data</span>
+<span class="s1">house_sizes = data[</span><span class="s3">'house_size'</span><span class="s1">].values</span>
+<span class="s1">house_prices = data[</span><span class="s3">'price'</span><span class="s1">].values  </span><span class="s2"># Replace 'price_column_name' with the actual name of the column containing house prices</span>
+
+<span class="s2"># reshape house sizes to become a column vector</span>
+<span class="s1">house_sizes = house_sizes.reshape(-</span><span class="s4">1</span><span class="s0">, </span><span class="s4">1</span><span class="s1">)</span>
+
+<span class="s2"># split the data into training and testing sets</span>
+<span class="s1">X_train</span><span class="s0">, </span><span class="s1">X_test</span><span class="s0">, </span><span class="s1">y_train</span><span class="s0">, </span><span class="s1">y_test = train_test_split(house_sizes</span><span class="s0">, </span><span class="s1">house_prices</span><span class="s0">, </span><span class="s1">test_size=</span><span class="s4">0.2</span><span class="s0">, </span><span class="s1">random_state=</span><span class="s4">42</span><span class="s1">)</span>
+<span class="s2"># 20% of data for testing and rest for training</span>
+<span class="s2"># random state makes sure data splitting is reproducible</span>
+
+<span class="s2"># create and train the linear regression model</span>
+<span class="s1">model = LinearRegression()  </span><span class="s2"># create a linear regression model object</span>
+<span class="s1">model.fit(X_train</span><span class="s0">, </span><span class="s1">y_train)  </span><span class="s2"># train the model using training data</span>
+
+<span class="s2"># make predictions on the testing set</span>
+<span class="s1">y_pred = model.predict(X_test)  </span><span class="s2"># make predictions on the test data</span>
+
+<span class="s2"># calculate the mean squared error</span>
+<span class="s1">mse = mean_squared_error(y_test</span><span class="s0">, </span><span class="s1">y_pred)</span>
+<span class="s2"># mse calculates the difference between predicted and actual values</span>
+<span class="s1">print(</span><span class="s3">&quot;The mean squared error of the model is:&quot;</span><span class="s0">, </span><span class="s1">mse)</span>
+
+<span class="s2"># plot the actual vs. predicted prices</span>
+<span class="s1">plt.scatter(X_test</span><span class="s0">, </span><span class="s1">y_test</span><span class="s0">, </span><span class="s1">color=</span><span class="s3">'black'</span><span class="s1">)  </span><span class="s2"># plot actual prices</span>
+<span class="s1">plt.plot(X_test</span><span class="s0">, </span><span class="s1">y_pred</span><span class="s0">, </span><span class="s1">color=</span><span class="s3">'blue'</span><span class="s0">, </span><span class="s1">linewidth=</span><span class="s4">3</span><span class="s1">)  </span><span class="s2"># plot predicted prices</span>
+<span class="s1">plt.xlabel(</span><span class="s3">'House Size'</span><span class="s1">)  </span><span class="s2"># X axis label</span>
+<span class="s1">plt.ylabel(</span><span class="s3">'House Price'</span><span class="s1">)  </span><span class="s2"># y axis label</span>
+<span class="s1">plt.title(</span><span class="s3">'House Price Prediction'</span><span class="s1">)  </span><span class="s2"># plot title</span>
+<span class="s1">plt.show()  </span><span class="s2"># show plot</span>
+</pre>
+</body>
+</html>
